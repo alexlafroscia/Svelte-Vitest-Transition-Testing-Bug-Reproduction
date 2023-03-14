@@ -16,5 +16,5 @@
         If it's removed, the tests pass again
         When the transition is present, the DOM node is not *actually* removed
     -->
-	<p data-testid="paragraph" transition:fade>Some Text</p>
+	<p data-testid="paragraph" transition:fade|local>Some Text</p>
 {/if}
