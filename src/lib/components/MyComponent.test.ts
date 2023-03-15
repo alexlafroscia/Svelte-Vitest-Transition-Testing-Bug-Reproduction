@@ -3,8 +3,6 @@ import { render, fireEvent, waitForElementToBeRemoved } from '@testing-library/s
 import MyComponent from './MyComponent.svelte';
 
 test('toggling an element with a transition', async () => {
-	console.log(window.requestAnimationFrame);
-	
 	const { getByTestId, queryByTestId } = render(MyComponent);
 
 	expect(queryByTestId('paragraph')).toBeNull();
