@@ -46,7 +46,7 @@
 		},
 		"test": {
 			"name": "test",
-			"command": "test"
+			"command": "yarn test"
 		}
 	}
 }

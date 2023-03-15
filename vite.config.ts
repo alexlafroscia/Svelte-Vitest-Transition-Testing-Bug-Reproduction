@@ -4,7 +4,7 @@ import { defineConfig } from 'vitest/config';
 export default defineConfig({
 	plugins: [
 		sveltekit(),
-		
+
 		// Ensure the `browser` condition is used to load `svelte`
 		{
 			name: 'vitest-resolve-browser-condition',
