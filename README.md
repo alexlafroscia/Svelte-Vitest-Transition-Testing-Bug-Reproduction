@@ -1,77 +1,36 @@
-# create-svelte
+# Svelte/Vitest/JSDOM Transition Bug Reproduction
 
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
+This repo demonstrates a bug when using JSDOM through Vitest in an attempt to test a component that hides an element using a transition to animate the element's removal.
 
-## Creating a project
+## Running the Demo
 
-If you're seeing this, you've probably already done this step. Congrats!
+After cloning the repo
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
-
-# create a new project in my-app
-npm create svelte@latest my-app
+```
+yarn install
+yarn test
 ```
 
-## Developing
+This will run the tests, which will fail, because the element that should have been removed from the DOM was not actually removed.
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+## What's Going On?
 
-```bash
-npm run dev
+I believe the issue has something to do with the JSDOM implementation of `requestAnimationFrame`, which Svelte relies on for these transitions.
 
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+If I replace the `jsdom` environment for Vitest with `happy-dom`, the error is resolved. Additionally, stubbing the `requestAnimationFrame` implementation can fix the problem as well.
+
+```ts
+beforeEach(() => {
+  vi.stubGlobal('requestAnimationFrame', (fn) => {
+    return window.setTimeout(() => fn(Date.now()), 16);
+  });
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
 ```
 
-## Building
+## Other Related Issues
 
-To create a production version of your app:
-
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
-
-# create-svelte
-
-Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte).
-
-## Creating a project
-
-If you're seeing this, you've probably already done this step. Congrats!
-
-```bash
-# create a new project in the current directory
-npm create svelte@latest
-
-# create a new project in my-app
-npm create svelte@latest my-app
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
+- https://github.com/testing-library/svelte-testing-library/issues/206
